@@ -9,7 +9,514 @@ console.log('⏳ TX swap:', swapTx.hash);
                 
             } else {
                 const tokenContract = new ethers.Contract(
-                    tokenAddress,
+                    tokenAddress,<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Trading Multi-Crypto Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #581c87, #0f172a);
+            min-height: 100vh;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-white p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    Bot Trading Multi-Crypto Pro
+                </h1>
+                <p class="text-gray-400 mt-2">Trading réel BSC • Prix temps réel • Trading automatique 24/7</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="openDCASwap()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg font-semibold transition-all">
+                    <span>🔄</span>
+                    DCA/Swap
+                    <span>↗</span>
+                </button>
+                
+                <button onclick="connectWallet()" id="connectBtn" class="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600">
+                    <span>👛</span>
+                    <span id="walletText">Connecter MetaMask</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="subscriptionSection" class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>💎</span>
+                Abonnement Bot Trading Pro
+            </h3>
+            
+            <div id="freeTrialInfo" class="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
+                <p class="text-green-300 font-bold mb-2">🎁 OFFRE DE LANCEMENT</p>
+                <p class="text-sm text-green-200">
+                    ✅ 2 jours GRATUITS pour tester le bot<br>
+                    ✅ Toutes les fonctionnalités incluses<br>
+                    ✅ Trading réel + Simulation<br>
+                    <span id="trialDaysRemaining" class="font-bold text-green-400"></span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="bg-slate-700/50 border-2 border-slate-600 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer" onclick="selectPlan(1, 1)">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-purple-400">1 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">1 jour</p>
+                        <p class="text-xs text-gray-500 mt-2">Essai simple</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-700/50 border-2 border-purple-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(7, 6)">
+                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
+                        -14%
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-purple-400">6 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">7 jours</p>
+                        <p class="text-xs text-gray-500 mt-2">0.86 USDT/jour</p>
+                        <p class="text-xs text-green-400 mt-1">⭐ Populaire</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-700/50 border-2 border-yellow-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(30, 20)">
+                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
+                        -33%
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-yellow-400">20 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">30 jours</p>
+                        <p class="text-xs text-gray-500 mt-2">0.67 USDT/jour</p>
+                        <p class="text-xs text-yellow-400 mt-1">🏆 Meilleure valeur</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="selectedPlanInfo" class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 mb-4 hidden">
+                <p class="text-blue-300 font-bold mb-2">📋 Forfait sélectionné</p>
+                <p class="text-sm text-blue-200">
+                    <span id="planDuration"></span> jours pour <span id="planPrice"></span> USDT
+                </p>
+            </div>
+
+            <button onclick="processPayment()" id="paymentBtn" class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <span>💳</span>
+                <span id="paymentBtnText">Sélectionnez un forfait</span>
+            </button>
+
+            <div class="mt-4 p-3 bg-slate-700/50 rounded-lg">
+                <p class="text-xs text-gray-400 text-center">
+                    🔒 Paiement sécurisé via BSC • Pas de données bancaires requises
+                </p>
+            </div>
+        </div>
+
+        <div id="cryptoSelector" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Sélectionner la Crypto</h3>
+                <button onclick="fetchCryptoList()" id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all">
+                    <span id="refreshIcon">🔄</span>
+                    <span id="refreshText">Actualiser</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Cryptomonnaie <span id="cryptoCount"></span></label>
+                    <select id="cryptoSelect" onchange="changeCrypto()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
+                        <option>Chargement...</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2">💎 = Trading réel OK • 🎮 = Simulation</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Mode de Trading</label>
+                    <select id="tradingMode" onchange="changeTradingMode()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
+                        <option value="simulation">🎮 Simulation</option>
+                        <option value="real">💎 Réel (PancakeSwap)</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2" id="modeInfo">⚠️ Activez uniquement si vous comprenez les risques</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="privateKeySection" class="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>🔐</span>
+                Trading Automatique 24/7 (Optionnel)
+            </h3>
+            
+            <div class="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4">
+                <p class="text-red-300 font-bold mb-2">⚠️ AVERTISSEMENTS CRITIQUES</p>
+                <ul class="text-sm text-red-200 space-y-1">
+                    <li>• Utilisez UNIQUEMENT un wallet dédié avec petit capital</li>
+                    <li>• Votre clé privée ne sera JAMAIS sauvegardée</li>
+                    <li>• Stockée uniquement en mémoire pendant la session</li>
+                    <li>• Effacée automatiquement à la fermeture de l'onglet</li>
+                    <li>• Laissez vide pour utiliser MetaMask (manuel)</li>
+                    <li>• <strong>MODE 24/7: Gardez l'onglet ouvert et l'écran allumé</strong></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Clé Privée (pour trading automatique sans confirmation)</label>
+                    <input type="password" id="privateKeyInput" placeholder="0x... ou laisser vide pour MetaMask" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400">
+                    <p class="text-xs text-gray-400 mt-1">
+                        <span class="text-yellow-400">⚡</span> Vide = Mode manuel (MetaMask) | Rempli = Mode automatique 24/7
+                    </p>
+                </div>
+                
+                <button onclick="togglePrivateKeyVisibility()" class="text-sm text-blue-400 hover:underline">
+                    👁️ Afficher/Masquer la clé
+                </button>
+            </div>
+        </div>
+
+        <div id="capitalSection" class="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-2 border-yellow-400 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>🎯</span>
+                Capital de trading en USDT
+            </h3>
+            <p class="text-gray-300 mb-4">
+                Montant en USDT pour le trading automatique
+                <br />
+                <span class="text-sm text-gray-400">Solde disponible: <span id="availableBalance" class="font-bold text-green-400">0</span> USDT</span>
+            </p>
+            <div class="flex gap-4 mb-3">
+                <input type="number" id="capitalInput" placeholder="Ex: 50" step="10" class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400">
+                <button onclick="setCapital()" class="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 rounded-lg font-semibold transition-all">
+                    Valider
+                </button>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="setMaxCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
+                    💯 Utiliser 100%
+                </button>
+                <button onclick="setHalfCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
+                    ➗ Utiliser 50%
+                </button>
+                <button onclick="syncWalletBalance()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-all">
+                    🔄 Actualiser
+                </button>
+            </div>
+        </div>
+
+        <div id="statsCards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 hidden">
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Capital</p>
+                <p class="text-xl font-bold mt-1 text-green-400">$<span id="capitalDisplay">0</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Prix <span id="cryptoName">BTC</span></p>
+                <p class="text-xl font-bold mt-1">$<span id="currentPrice">...</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Profit</p>
+                <p class="text-xl font-bold mt-1 text-green-400">$<span id="profitDisplay">0.00</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Mode</p>
+                <p class="text-xl font-bold mt-1" id="modeDisplay">🎮 SIM</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">📈 Graphique de Trading</h2>
+                        <div class="text-sm text-gray-400">
+                            <span id="chartCrypto">BTC</span>/USDT
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="tradingChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4">Stratégies</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="strategiesGrid"></div>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Historique des Trades</h2>
+                        <button onclick="toggleBot()" id="toggleBotBtn" disabled class="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-gray-600 cursor-not-allowed">
+                            <span id="botIcon">▶️</span>
+                            <span id="botText">Démarrer</span>
+                        </button>
+                    </div>
+                    <div id="tradesContainer">
+                        <div class="text-center py-8 text-gray-400">
+                            <span class="text-4xl">⚠️</span>
+                            <p>Aucun trade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Paramètres</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">% par trade</label>
+                        <input type="number" id="tradePercent" value="10" min="1" max="100" onchange="updateTradeAmount()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
+                        <p class="text-xs text-gray-400 mt-1">Montant: $<span id="tradeAmount">0</span></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Slippage (%)</label>
+                        <input type="number" id="slippage" value="1" step="0.1" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
+                        <p class="text-xs text-gray-400 mt-1">⚠️ Recommandé: 1-2% pour tokens volatils</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-green-400">💰</span>
+                        <div class="text-sm text-gray-300">
+                            <p class="font-semibold text-green-400">Soldes</p>
+                            <p>BNB: <span id="bnbBalance">0</span></p>
+                            <p>USDT: $<span id="usdtBalance">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-blue-400">📊</span>
+                        <div class="text-sm text-gray-300">
+                            <p class="font-semibold text-blue-400">Statut</p>
+                            <p>Wallet: <span id="walletStatus">🔴 Non connecté</span></p>
+                            <p>Mode: <span id="tradingTypeStatus">🟡 ...</span></p>
+                            <p>Position: <span id="positionStatus">⚪ Aucune</span></p>
+                            <p>Binance: <span id="apiStatus">🟡 ...</span></p>
+                            <p>Ethers: <span id="ethersStatus">🟡 ...</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-red-400/10 border border-red-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-red-400">⚠️</span>
+                        <div class="text-xs text-gray-300">
+                            <p class="font-semibold text-red-400">ATTENTION</p>
+                            <p>• Risque de perte totale</p>
+                            <p>• Frais gas + slippage</p>
+                            <p>• Minimum 0.01 BNB pour gas</p>
+                            <p>• Commencez petit (10-50$)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PANCAKE_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
+        const USDT_CONTRACT = '0x55d398326f99059fF775485246999027B3197955';
+        const BSC_RPC = 'https://bsc-dataseed1.binance.org';
+        
+        const OWNER_WALLET = '0x5959f13ad996ab184780a778cf6d594786f44250';
+        const FREE_WALLET = '0xb44dd82c004a767d23b890f788fd6f9b13fcf6a4';
+        const FREE_TRIAL_DAYS = 2;
+
+        let state = {
+            account: null, 
+            isConnected: false, 
+            balanceBNB: '0', 
+            balanceUSDT: '0',
+            selectedCrypto: 'BTCUSDT', 
+            cryptoList: [], 
+            currentPrice: null, 
+            priceHistory: [],
+            tradingCapital: 0, 
+            capitalSet: false, 
+            tradingMode: 'simulation',
+            botRunning: false, 
+            trades: [], 
+            portfolio: { profit: 0, profitPercent: 0 },
+            indicators: { rsi: 50, macd: { histogram: 0 }, ema20: 0, ema50: 0 },
+            selectedStrategy: 'scalping', 
+            provider: null,
+            privateKey: null,
+            wallet: null,
+            autoMode: false,
+            currentPosition: null,
+            lastBuyPrice: 0,
+            positionAmount: 0,
+            lastSellTime: 0,
+            chartData: { labels: [], prices: [], buyPoints: [], sellPoints: [] },
+            subscription: {
+                isActive: false,
+                expiryDate: null,
+                firstAccessDate: null,
+                selectedPlan: null
+            }
+        };
+
+        let ws = null, botInterval = null, lastTradeTime = 0;
+        let tradingChart = null;
+        
+        // Système anti-veille
+        let wakeLock = null;
+        let audioContext = null;
+        let positionUpdateInterval = null;
+
+        const POST_SELL_COOLDOWN = 120000;
+
+        const TOKEN_ADDRESSES = {
+            'BTCUSDT': '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',
+            'ETHUSDT': '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
+            'BNBUSDT': '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+        };
+
+        const strategies = {
+            scalping: { 
+                name: 'Scalping', 
+                description: 'Rapide RSI+MACD', 
+                minTradeInterval: 180000,
+                rsiBuyThreshold: 40,
+                rsiBuyStrong: 30,
+                rsiSellThreshold: 60,
+                rsiSellStrong: 70,
+                takeProfit: 1.5,
+                stopLoss: -1.0
+            },
+            swing: { 
+                name: 'Swing', 
+                description: 'Positions EMA', 
+                minTradeInterval: 900000,
+                rsiBuyThreshold: 35,
+                rsiBuyStrong: 25,
+                rsiSellThreshold: 70,
+                rsiSellStrong: 75,
+                takeProfit: 3.0,
+                stopLoss: -2.0
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Bot chargé avec ethers.js');
+            
+            if (typeof ethers !== 'undefined') {
+                document.getElementById('ethersStatus').innerHTML = '🟢 v' + ethers.version;
+                console.log('✅ Ethers.js version:', ethers.version);
+            } else {
+                document.getElementById('ethersStatus').innerHTML = '🔴 Erreur';
+                console.error('❌ Ethers.js non chargé');
+            }
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    console.log('⚠️ Onglet masqué - Le bot continue en arrière-plan');
+                } else {
+                    console.log('✅ Onglet visible - Reprise normale');
+                    
+                    if (ws && ws.readyState !== WebSocket.OPEN) {
+                        console.log('🔄 Reconnexion WebSocket après retour...');
+                        connectWebSocket();
+                    }
+                }
+            });
+            
+            setInterval(() => {
+                if (state.botRunning) {
+                    const dummy = Date.now();
+                }
+            }, 15000);
+            
+            startPositionUpdater();
+            
+            initChart();
+            renderStrategies();
+            fetchCryptoList();
+        });
+        
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('🔓 Wake Lock activé - l\'écran restera allumé');
+                    
+                    wakeLock.addEventListener('release', () => {
+                        console.log('⚠️ Wake Lock relâché');
+                    });
+                }
+            } catch (err) {
+                console.log('⚠️ Wake Lock non disponible:', err.message);
+            }
+        }
+        
+        function keepAlive() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    gainNode.gain.value = 0.001;
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.start();
+                    console.log('🔊 Audio Keep-Alive activé (silencieux)');
+                } catch (e) {
+                    console.log('⚠️ Audio Context non disponible');
+                }
+            }
+        }
+        
+        function startPositionUpdater() {
+            positionUpdateInterval = setInterval(() => {
+                if (state.currentPosition && state.currentPrice && state.lastBuyPrice > 0) {
+                    const profitPercent = ((state.currentPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
+                    const profitUSDT = state.positionAmount * (profitPercent / 100);
+                    
+                    const statusElement = document.getElementById('positionStatus');
+                    if (statusElement) {
+                        statusElement.innerHTML = `🟢 Long ${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}% (${profitUSDT >= 0 ? '+' : ''}${profitUSDT.toFixed(2)} USDT)`;
+                        statusElement.className = profitPercent >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
+                    }
+                } else {
+                    const statusElement = document.getElementById('positionStatus');
+                    if (statusElement) {
+                        statusElement.innerHTML = '⚪ Aucune';
+                        statusElement.className = 'text-gray-400';
+                    }
+                }
+            }, 2000);
+            
+            console.log('🔄 Actualisation permanente de la position activée (toutes les 2s)');
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('tradingChart').getContext('2d');
+            tradingChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Prix',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
                     [
                         'function balanceOf(address account) view returns (uint256)',
                         'function allowance(address owner, address spender) view returns (uint256)',
